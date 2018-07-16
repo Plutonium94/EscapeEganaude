@@ -124,9 +124,9 @@
 			trajets.forEach(function(lh, ind) {
 				destinations.add(lh.direction);
 			});
-			destinations.forEach(function(d) {
+			destinations.forEach(function(d, ind) {
 				res += '<li><input type="checkbox"' +
-					 'data-direction ="'+d+'" checked>'+d+'</li>';
+					 'data-direction ="'+d+'" checked id="d'+ind+'"><label for="d'+ind+'">'+d+'</label></li>';
 			});
 			document.getElementById('destinations').innerHTML = res;
 		}
@@ -201,8 +201,8 @@
 			trierTrajets();
 			listerDestinations();
 			listerTousHoraires();
-			toggleVisibilityLignes();
 			rememberChoices();
+			toggleVisibilityLignes();
 		});
 	</script>
 
