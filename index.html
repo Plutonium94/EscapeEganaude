@@ -173,8 +173,27 @@
 					} else {
 						section.setAttribute('data-montre', 'true');
 					}
-				})
+					storeChoices();
+				});
 			});
+		}
+
+		function storeChoices() {
+			document.querySelectorAll('ul#destinations li input[type="checkbox"]').forEach((checkbox, i)=> {
+				var direction = checkbox.getAttribute('data-direction');
+				localStorage['show-' + direction] = checkbox.checked;
+			});
+			localStorage['direction-choices'] = true;
+		}
+
+		function rememberChoices() {
+			if(localStorage.getItem('direction-choices')) {
+				document.querySelectorAll('ul#destinations li input[type="checkbox"]').forEach((checkbox, i)=> {
+					var direction = checkbox.getAttribute('data-direction');
+					checkbox.checked = localStorage.getItem('show-' + direction) == 'true';
+				});
+
+			}
 		}
 
 
@@ -183,6 +202,7 @@
 			listerDestinations();
 			listerTousHoraires();
 			toggleVisibilityLignes();
+			rememberChoices();
 		});
 	</script>
 
