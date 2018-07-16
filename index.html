@@ -6,32 +6,153 @@
 	<title>Escape from Eganaude</title>
 </head>
 <body>
+	<style>
+		span.h {
+			margin-right: 40px;
+		}
+
+		span[data-ligne] + span.h {
+			background-color: rgb(35, 200, 87);
+			padding: 1px;
+			border-radius:2px;
+			color: #eeeeee;
+		}
+
+		span[data-ligne] {
+			font-weight: bold;
+			padding: 3px;
+			margin-right: 60px;
+			width:25px;
+			text-align: center;
+			display: inline-block;
+		}
+
+		span[data-ligne="1"] {
+			background-color: yellow;
+		}
+
+		span[data-ligne="9"] {
+			background-color: green;
+		}
+
+		span[data-ligne="12"] {
+			background-color: maroon;
+		}
+
+		span[data-ligne="20"] {
+			background-color: pink;
+		}
+
+		span[data-ligne="22"] {
+			background-color: greenyellow;
+		}
+
+		span[data-ligne="100"] {
+			background-color: red;
+		}
+
+		span[data-ligne="230"] {
+			background-color: DarkOrange;
+		}
+	</style>
 	<h1>Escape from Eganaude</h1>
 		
-	
+
+	<ul id="destinations">
+
+	</ul>
+
+	<main>
+
+	</main>
+
 	
 	<script>
 
-		var trajets = [{ligne : "1 - Vers Gare Routière Sophia Antipolis", horaires: [16.31, 17.05, 17.24, 17.52, 18.08, 18.27, 18.51, 19.15, 19.41, 20.18, 20.48, 22.16] },
-			{ligne: "1 - Vers Amphores",
+		var GRSA = 'Gare Routière Sophia Antipolis';
+		var AMP = 'Amphores';
+		var PEA = 'Pôle Echanges Antibes';
+		var BA  = 'Bel Air';
+		var SN = 'Square Nabonnand'; 
+
+		var trajets = [{ligne : 1, direction: GRSA, horaires: [16.31, 17.05, 17.24, 17.52, 18.08, 18.27, 18.51, 19.15, 19.41, 20.18, 20.48, 22.16] },
+			{ligne: 1, direction: AMP,
 			horaires: [ 16.40, 16.50, 17.05, 17.2, 17.30, 17.4, 17.5, 18.4, 19 ]},
-			{ligne : "100 - Vers Gare Routière Sophia Antipolis", horaires: [16.20, 16.45, 17, 17.18, 18.02, 18.23, 18.43, 19.01, 19.33]},
-			{ligne: "100 - Vers Pôle Echanges", horaires: [16.30, 16.45, 16.58, 17.07, 17.22,  17.42, 17.51, 18.11, 18.26, 18.50, 19.05, 19.30, 20.20]},
-			{ligne: "12 - Vers Gare Routière Sophia Antipolis",
+			{ligne : 100, direction: GRSA, horaires: [16.20, 16.45, 17, 17.18, 18.02, 18.23, 18.43, 19.01, 19.33]},
+			{ligne: 100, direction: PEA, horaires: [16.30, 16.45, 16.58, 17.07, 17.22,  17.42, 17.51, 18.11, 18.26, 18.50, 19.05, 19.30, 20.20]},
+			{ligne: 12, direction: GRSA,
 			horaires: [16.55, 17.3, 18.1, 18.45]}, 
-			{ligne: "12 - Vers Pôle Echanges Antibes",
+			{ligne: 12, direction: PEA,
 			horaires: [16.34, 17.14, 17.54, 18.29, 19.04]},
-			{ligne: "22 - Vers Bel Air",
+			{ligne: 22, direction: BA,
 			horaires: [16.21, 17.22, 18.17, 19.12]},
-			{ligne: "20 - Vers Gare Routière Sophia Antipolis",
+			{ligne: 20, direction: GRSA,
 			horaires: [17, 17.5, 18.52]},
-			{ligne: "20 - Vers Square Nabonnand",
-			horaires: [16.35, 17.27, 18.21, 19.2]}
+			{ligne: 20, direction: SN,
+			horaires: [16.35, 17.27, 18.21, 19.2]},
+			{ligne: 230, direction: 'Nice par Promenade', 
+			horaires: [16.34, 16.49, 17.04, 17.14, 17.24, 17.34, 17.44, 17.54, 18.04, 18.24, 18.34, 18.49, 19.04, 19.34, 20.14]},
+			{ligne: 230, direction: 'Nice par Nice Nord',
+			horaires: [16.53, 17.28, 17.58, 18.38, 19.18]}
 			];	
+
+		function listerProchainHoraires(lh) {
+			var maintenant = new Date();
+			maintenant = maintenant.getHours() + maintenant.getMinutes()/100.0;
+			var res = lh.horaires.filter(function(h) {
+				return h >= maintenant;
+			});
+			return res;
+		}
+
+		function listerDestinations() {
+			var destinations = new Set();
+			var res = '';
+			trajets.forEach(function(lh, ind) {
+				destinations.add(lh.direction);
+			});
+			destinations.forEach(function(d) {
+				res += '<li>'+d+'</li>';
+			});
+			document.getElementById('destinations').innerHTML = res;
+		}
+
+		function trierTrajets() {
+			trajets.sort((a,b)=> {
+				var cd = a.direction.localeCompare(b.direction);
+				if(cd != 0)  { return cd; }
+				return a.ligne - b.ligne;
+			});
+			console.log(trajets);
+		}
+
+		function listerTousHoraires() {
+			var resContenu = '';
+			var dernierDirection = '';
+			trajets.forEach((ldh, ind)=> {
+				if(dernierDirection != ldh.direction) {
+					if(dernierDirection !== '') { resContenu += '</section>'} 
+					resContenu += '<section data-direction="'+ldh.direction+'"><h3>' + ldh.direction + '</h3>';
+					dernierDirection = ldh.direction;
+				}
+				var prochainHoraires = listerProchainHoraires(ldh);
+				prochainHoraires = prochainHoraires.map((h,ind)=> {
+					h =  Math.floor(h * 100);
+					var heures = Math.floor(h/100);
+					var minutes = ('' + h%100).padStart(2,'0');
+					return '<span class="h">' + heures + 'h' + minutes + '</span>';
+				});
+				resContenu += '<p><span data-ligne="' + ldh.ligne+'">'+ ldh.ligne + '</span> ' +  prochainHoraires.join('') + '</p>';
+
+			});
+			document.querySelector('main').innerHTML = resContenu;
+		}
 
 
 		window.addEventListener('DOMContentLoaded', function(evt) {
-	
+			trierTrajets();
+			listerDestinations();
+			listerTousHoraires();
 		});
 	</script>
 
