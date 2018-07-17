@@ -7,15 +7,29 @@
 </head>
 <body>
 	<style>
+
+		article {
+			width: 80%;
+			margin: auto;
+			background-color: #a594e3;
+			display: block;
+			padding: 4px 15px;
+			font-family: "Tahoma";
+		}
+
+
 		span.h {
 			margin-right: 40px;
+			display: inline-block;
 		}
 
 		span[data-ligne] + span.h {
 			background-color: rgb(35, 200, 87);
 			padding: 1px;
 			border-radius:2px;
-			color: #eeeeee;
+			color: #dddddd;
+			font-weight: bold;
+			border: 1px solid rgb(25, 175, 62);
 		}
 
 		span[data-ligne] {
@@ -68,16 +82,19 @@
 		}
 
 	</style>
-	<h1>Escape from Eganaude</h1>
-		
+	<article>
+		<h1>Escape from Eganaude</h1>
+			
+		<small>Cocher vos destinations</small>
+		<ul id="destinations">
 
-	<ul id="destinations">
+		</ul>
 
-	</ul>
+		<main>
 
-	<main>
+		</main>
 
-	</main>
+	</article>
 
 	
 	<script>
