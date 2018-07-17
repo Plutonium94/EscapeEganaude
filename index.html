@@ -11,7 +11,7 @@
 		article {
 			width: 80%;
 			margin: auto;
-			background-color: #a594e3;
+			background-color: #a599e7;
 			display: block;
 			padding: 4px 15px;
 			font-family: "Tahoma";
@@ -21,6 +21,7 @@
 		span.h {
 			margin-right: 40px;
 			display: inline-block;
+			text-align: center;
 		}
 
 		span[data-ligne] + span.h {
@@ -36,7 +37,7 @@
 			font-weight: bold;
 			padding: 3px;
 			margin-right: 60px;
-			width:25px;
+			width:38px;
 			text-align: center;
 			display: inline-block;
 		}
@@ -62,11 +63,18 @@
 		}
 
 		span[data-ligne="100"] {
-			background-color: red;
+			background-color: DeepPink;
 		}
 
 		span[data-ligne="230"] {
 			background-color: DarkOrange;
+		}
+
+		main p span.h[data-alarm] {
+			background-color: Gold;
+			font-weight: bold;
+			color: black;
+			padding: 4px;
 		}
 
 		ul#destinations li {
@@ -104,6 +112,8 @@
 		var PEA = 'Pôle Echanges Antibes';
 		var BA  = 'Bel Air';
 		var SN = 'Square Nabonnand'; 
+
+		var delaiAlarm = 1;
 
 		var trajets = [{ligne : 1, direction: GRSA, horaires: [16.31, 17.05, 17.24, 17.52, 18.08, 18.27, 18.51, 19.15, 19.41, 20.18, 20.48, 22.16] },
 			{ligne: 1, direction: AMP,
@@ -233,14 +243,70 @@
 			}
 		}
 
+		function setAlarmListeners() {
+			var existingAlarms = localStorage['alarm'];
+			var alarmListe = (existingAlarms)?JSON.parse(existingAlarms) : [];
+			if(alarmListe) {
+				document.querySelectorAll('span.h').forEach((sh, ind) => {
+					var heure = sh.textContent;
+					if(alarmListe.includes(heure)) {
+						sh.setAttribute('data-alarm','true');
+					} else {
+						sh.removeAttribute('data-alarm');
+					}
+				});
+			}
+			document.querySelectorAll('span.h').forEach((sh, ind)=> {
+				sh.addEventListener('click',(evt)=> {
+					var heure = evt.target.textContent;
+					console.log(heure);
+					if(!sh.hasAttribute('data-alarm')) {
+						activateAlarm(heure, delaiAlarm);
+						evt.target.setAttribute('data-alarm', 'true');
+						alarmListe.push(heure);
+						localStorage['alarm'] = JSON.stringify(alarmListe);
+					} else {
+						evt.target.removeAttribute('data-alarm');
+						alarmListe = alarmListe.filter((a) => { return a != heure; });
+					}
+					localStorage['alarm'] = JSON.stringify(alarmListe);
+
+				});
+			});
+		}
+
+		function activateAlarm(h, delai) {
+			var heureCible = new Date();
+			heureCible.setHours(h.substring(0,2));
+			heureCible.setMinutes(h.substring(3));
+			heureCible = heureCible.getTime();
+			heureCible -= (delai * 60000);
+			console.log(heureCible);
+			console.log(new Date(heureCible));
+			var maintenant = Date.now();
+			console.log((heureCible - maintenant)/60000);
+			var alarm = setTimeout(()=> {
+				document.title = 'Le Bus !!!!';
+				var utt = new SpeechSynthesisUtterance();
+				utt.text = 'Your bus leaves in ' + delaiAlarm + ' minutes ! Run !!';
+				speechSynthesis.speak(utt);
+				utt.lang = 'fr-FR';
+				console.log('alarm');
+			}, (heureCible-maintenant));
+
+
+		}
+
 
 		window.addEventListener('DOMContentLoaded', function(evt) {
 			trierTrajets();
 			listerDestinations();
 			listerTousHoraires();
+			setAlarmListeners();
 			setLignesCheckboxListeners();
 			rememberChoices();
 			toggleAllVisibilityLignes();
+			
 		});
 	</script>
 
