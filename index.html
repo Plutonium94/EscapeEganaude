@@ -162,37 +162,57 @@
 			document.querySelector('main').innerHTML = resContenu;
 		}
 
-		function toggleVisibilityLignes() {
+
+		function toggleAllVisibilityLignes() {
+			document.querySelectorAll('ul#destinations li input[type="checkbox"]').forEach((checkbox, i)=> {
+				toggleVisibilityLignes(checkbox);
+			});
+		}
+
+		function setLignesCheckboxListeners() {
 			document.querySelectorAll('ul#destinations li input[type="checkbox"]').forEach((checkbox, i)=> {
 				checkbox.addEventListener('change', (evt)=> {
+					console.log(evt);
 					var cb = evt.target;
 					var direction = cb.getAttribute('data-direction');
 					var section = document.querySelector('section[data-direction="'+ direction +'"]');
-					if(section.getAttribute('data-montre')=='true') {
-						section.setAttribute('data-montre','false');
-					} else {
-						section.setAttribute('data-montre', 'true');
-					}
+					toggleVisibilityLignes(cb);					
 					storeChoices();
 				});
 			});
 		}
 
+		function toggleVisibilityLignes(checkbox) {
+			var direction = checkbox.getAttribute('data-direction');
+			var montre = '' + checkbox.checked;
+			var section = document.querySelector('section[data-direction="'+ direction +'"]');
+			section.setAttribute('data-montre',montre);
+		}
+
 		function storeChoices() {
+			console.log('storeChoices called');
 			document.querySelectorAll('ul#destinations li input[type="checkbox"]').forEach((checkbox, i)=> {
 				var direction = checkbox.getAttribute('data-direction');
-				localStorage['show-' + direction] = checkbox.checked;
+				localStorage['show-' + direction] = (checkbox.checked)?'true':'false'	;
+				console.log(direction + ' ' +localStorage['show-' + direction]);
 			});
-			localStorage['direction-choices'] = true;
+			localStorage['direction-choices'] = 'true';
 		}
 
 		function rememberChoices() {
 			if(localStorage.getItem('direction-choices')) {
 				document.querySelectorAll('ul#destinations li input[type="checkbox"]').forEach((checkbox, i)=> {
-					var direction = checkbox.getAttribute('data-direction');
-					checkbox.checked = localStorage.getItem('show-' + direction) == 'true';
-				});
 
+
+					var direction = checkbox.getAttribute('data-direction');
+					console.log(localStorage.getItem('show-'+direction));
+
+					checkbox.checked = JSON.parse(localStorage.getItem('show-' + direction));
+					console.log(checkbox.checked);
+				});
+				toggleAllVisibilityLignes();
+			} else {
+				console.log('nothing to rememberChoices');
 			}
 		}
 
@@ -201,8 +221,9 @@
 			trierTrajets();
 			listerDestinations();
 			listerTousHoraires();
+			setLignesCheckboxListeners();
 			rememberChoices();
-			toggleVisibilityLignes();
+			toggleAllVisibilityLignes();
 		});
 	</script>
 
